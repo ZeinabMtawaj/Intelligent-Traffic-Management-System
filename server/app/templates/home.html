@@ -1,0 +1,970 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Modern Sidebar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            font-size: 16px;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #sidebar {
+              position: absolute;
+              top: 0;
+              left: -300px;  /* initial off-screen position */
+              height: 100%;
+              width: 300px;
+              background-color: #ffffff;
+              box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+              padding: 20px;
+              overflow-y: auto;
+              transition: left 0.3s;
+              z-index: 1002;
+          }
+
+          #menuButton {
+              position: absolute;
+              top: 20px;
+              left: 20px;
+              background-color: #007BFF;
+              padding: 10px;
+              border-radius: 50%;
+              box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+              cursor: pointer;
+              z-index: 1001;
+
+
+          }
+
+        /* Stylish Input */
+        input[type="text"], input[type="submit"], input[type="datetime-local"] {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #555;
+        }
+
+        #menuButton:hover {
+            transform: scale(1.05);
+        }
+
+        #menuButton i {
+            color: white;
+            font-size: 24px;
+        }
+
+
+
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e5e5e5;
+}
+
+.sidebar-title {
+    font-size: 24px;
+    color: #2c3e50;  /* deep blue-gray color */
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.close-icon {
+    cursor: pointer;
+    color: #7f8c8d;  /* gray color for the icon */
+    font-size: 24px;
+    transition: color 0.3s;
+}
+
+.close-icon:hover {
+    color: #2c3e50;  /* deep blue-gray color */
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 16px;
+    color: #34495e;  /* blue-gray color */
+    letter-spacing: 0.5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        .form-input {
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+            border: 1px solid #4A90E2; /* A shade of blue for focus */
+        }
+
+.submit-btn {
+    background-color: transparent;
+    border: 2px solid #3949ab;
+    color: #3949ab;
+    padding: 8px 15px;
+    border-radius: 25px;
+    font-size: 16px;
+    margin-left: 10px;
+    transition: background-color 0.3s, color 0.3s;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background-color: #3949ab;
+    color: #ffffff;
+}
+
+
+
+        .leaflet-top.leaflet-right {
+            top: 10px;
+            right: 10px;
+        }
+
+        .sidebar-button {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #2980b9;
+    color: #ffffff;
+    border: none;
+    text-align: left;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.sidebar-button:hover {
+    background-color: #3498db;
+}
+
+.sidebar-content {
+    display: none;
+    margin-top: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+.back-icon {
+    font-size: 24px;
+    cursor: pointer;
+    color: #b0bec5;
+    display: block;
+    margin: 10px 0;
+    transition: color 0.3s;
+}
+
+.back-icon:hover {
+    color: #78909c;
+}
+
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.back-btn {
+    background-color: transparent;
+    border: 2px solid #3949ab;
+    color: #3949ab;
+    padding: 8px 15px;
+    border-radius: 25px;
+    font-size: 16px;
+    margin-right: 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.back-btn:hover {
+    background-color: #3949ab;
+    color: #ffffff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.sidebar-menu {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 5px;
+    margin: 5px 0;
+}
+
+.sidebar-menu-item:hover {
+    background-color: #f7f7f7; /* subtle hover effect */
+}
+
+.menu-icon {
+    font-size: 20px;
+    width: 30px;
+    margin-right: 10px;
+}
+
+.menu-text {
+    font-size: 18px;
+}
+
+
+
+
+
+
+
+
+
+
+.route {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.coordinate {
+    border: 1px dashed #aaa;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+button {
+    margin-top: 10px;
+}
+
+
+
+
+
+
+#etaDisplay {
+    position: absolute; /* Absolute positioning inside the map container */
+    top: 20px; /* Distance from the top of the map */
+    left: 50%; /* To center the div */
+    transform: translateX(-50%); /* To truly center the div */
+    padding: 10px 20px; /* Padding around the text */
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+    border-radius: 25px; /* Rounded corners */
+    color: white; /* White text color */
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+    pointer-events: none; /* Makes sure the div doesn't interfere with map interactions */
+    z-index: 1000;
+    display: none;
+}
+
+
+
+    @media screen and (max-width: 600px) {
+      #sidebar {
+        left: -100%;  /* Hide sidebar completely */
+        width: 100%;  /* Full width when visible */
+      }
+    }
+
+      #loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #fff;  /* change as needed */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    }
+
+    .butterfly {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+
+
+
+
+
+
+    </style>
+</head>
+
+<body>
+
+
+
+    <div id="map">
+    <div id="etaDisplay"></div>
+    </div>
+
+    <div id="menuButton" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+
+<div id="sidebar">
+    <div class="sidebar-header">
+        <span class="sidebar-title">Menu</span>
+        <span class="close-icon" onclick="toggleSidebar()"><i class="fas fa-times"></i></span>
+    </div>
+
+
+    <ul class="sidebar-menu">
+        <li class="sidebar-menu-item" onclick="showRouteForm()">
+            <span class="menu-icon"><i class="fas fa-route"></i></span>
+            <span class="menu-text">Route</span>
+        </li>
+        <li class="sidebar-menu-item" onclick="showInAdvanceRouteForm()">
+            <span class="menu-icon"><i class="fas fa-calendar-alt"></i></span>
+            <span class="menu-text">In Adcvance Route</span>
+        </li>
+        <li class="sidebar-menu-item" onclick="showTraffic()">
+            <span class="menu-icon"><i class="fas fa-car"></i></span> <!-- Traffic icon -->
+            <span class="menu-text">Traffic</span>
+        </li>
+        <li class="sidebar-menu-item" onclick="showMultipleRoutes()">
+            <span class="menu-icon"><i class="fas fa-map-marked-alt"></i></span> <!-- Multiple Routes icon -->
+            <span class="menu-text">Multiple Routes</span>
+        </li>
+    </ul>
+
+ <div id="InAdvanceRouteContent" class="sidebar-content">
+    <h2>Find Your Route In Advance</h2>
+
+<form id="routeForm">
+    <div class="form-group">
+        <label for="startingPoint" class="form-label">Starting Point:</label>
+        <input type="text" class="form-input" id="startingPoint" placeholder="Enter starting point">
+    </div>
+    <div class="form-group">
+        <label for="destination" class="form-label">Destination Point:</label>
+        <input type="text" class="form-input" id="destination" placeholder="Enter destination point">
+    </div>
+    <div class="form-group">
+        <label for="tripDatetime" class="form-label">Trip Date and Time:</label>
+        <input type="datetime-local" class="form-input" id="tripDatetime">
+    </div>
+
+    <div class="form-actions">
+        <button type="button" class="back-btn" onclick="showButtons()">Back</button>
+          <button type="button" onclick="populateCurrentLocation()">Use My Location</button>
+        <button type="submit" class="submit-btn" onclick="event.preventDefault(); getPredictedTrip();">Submit</button>
+    </div>
+</form>
+
+
+</div>
+
+
+<div id="RouteContent" class="sidebar-content">
+    <h2>Find Your Route</h2>
+
+<form id="routeForm">
+    <div class="form-group">
+        <label for="startingPointRoute" class="form-label">Starting Point:</label>
+        <input type="text" class="form-input" id="startingPointRoute" placeholder="Enter starting point">
+    </div>
+    <div class="form-group">
+        <label for="destinationRoute" class="form-label">Destination Point:</label>
+        <input type="text" class="form-input" id="destinationRoute" placeholder="Enter destination point">
+    </div>
+    <div class="form-actions">
+        <button type="button" class="back-btn" onclick="showButtons()">Back</button>
+          <button type="button" onclick="populateCurrentLocationRoute()">Use My Location</button>
+        <button type="submit" class="submit-btn" onclick="event.preventDefault(); callAPI();">Submit</button>
+    </div>
+</form>
+
+
+</div>
+
+
+
+
+<div id="RoutesContent" class="sidebar-content" >
+    <h2>Routes Input</h2>
+
+    <form id="routesForm">
+        <div id="routesContainer">
+            <!-- First route container is present by default -->
+            <div class="route">
+                <div class="coordinatesContainer">
+                    <div class="coordinate">
+                        <div class="form-group">
+                            <label class="form-label">Point:</label>
+                            <input type="text" class="form-input lat-input" placeholder="Enter point">
+                        </div>
+                        <button type="button" onclick="removeCoordinate(this)">Remove Coordinate</button>
+                    </div>
+                </div>
+                <button type="button" onclick="addCoordinate(this)">Add Another Coordinate</button>
+            </div>
+        </div>
+
+
+        <div class="form-actions">
+            <button type="button" class="back-btn" onclick="showButtons()">Back</button>
+            <button type="submit" class="submit-btn" onclick="processRoutes(event)">Submit</button>
+        </div>
+    </form>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+
+
+    <script>
+
+//window.addEventListener('load', function() {
+    // hide the loading overlay after everything has loaded
+  //  document.getElementById('loadingOverlay').style.display = 'none';
+//});
+
+        var polyline = null;
+
+        var map = L.map('map', {
+            zoomControl: false // Disable default zoom controls
+        }).setView([40.7128, -74.0060], 13);
+
+        // Add the zoom control on the top right
+        L.control.zoom({
+            position: 'topright'
+        }).addTo(map);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebar');
+            if (sidebar.style.left === '0px' || sidebar.style.left === '') {
+                sidebar.style.left = '-30%';
+            } else {
+                sidebar.style.left = '0px';
+            }
+        }
+
+function removePolyline() {
+    if (polyline) {
+        map.removeLayer(polyline);
+        polyline = null;
+    }
+}
+
+
+function hideETA() {
+    var etaDisplay = document.getElementById("etaDisplay");
+    etaDisplay.style.display = "none"; // Hide the ETA display
+}
+
+
+
+
+function showInAdvanceRouteForm() {
+  removePolyline()
+    // Hide the menu
+    document.querySelector(".sidebar-menu").style.display = "none";
+
+    // Show the route form
+    document.getElementById("InAdvanceRouteContent").style.display = "block";
+}
+
+
+
+function showRouteForm() {
+  removePolyline()
+    // Hide the menu
+    document.querySelector(".sidebar-menu").style.display = "none";
+
+    // Show the route form
+    document.getElementById("RouteContent").style.display = "block";
+}
+
+function fetchAndDrawTraffic() {
+    // Fetch traffic data from the API
+    fetch('/edge/get_traffic_data')
+        .then(response => response.json())
+        .then(data => {
+            // Remove existing traffic lines from the map
+            if (window.trafficLayers) {
+                window.trafficLayers.forEach(layer => map.removeLayer(layer));
+            }
+            window.trafficLayers = [];
+
+            // Process each data item and draw a line on the map
+            data.forEach(item => {
+                const latlngs = [item.start, item.end];
+                const color = item.traffic;
+                const line = L.polyline(latlngs, { color: color }).addTo(map);
+                window.trafficLayers.push(line);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching traffic data:', error);
+        });
+}
+
+function removeTrafficLines() {
+    if (window.trafficLayers) {
+        window.trafficLayers.forEach(layer => map.removeLayer(layer));
+    }
+    window.trafficLayers = [];
+}
+
+function showTraffic() {
+   removePolyline()
+    // Fetch and draw traffic
+    fetchAndDrawTraffic();
+}
+
+function showTrafficPrediction() {
+  removeTrafficLines()
+   removePolyline()
+    // Hide the menu
+    document.querySelector(".sidebar-menu").style.display = "none";
+
+    // Show the traffic prediction section
+    // Here, you need to create an HTML content for the traffic prediction and show it.
+    alert("Traffic Prediction function triggered!");
+}
+
+function showMultipleRoutes() {
+  removeTrafficLines()
+   removePolyline()
+    // Hide the menu
+    document.querySelector(".sidebar-menu").style.display = "none";
+
+    // Show the route form
+    document.getElementById("RoutesContent").style.display = "block";
+}
+
+
+
+
+
+
+
+
+function showButtons() {
+    // Hide all content divs
+    var contents = document.getElementsByClassName('sidebar-content');
+    for (var i = 0; i < contents.length; i++) {
+        contents[i].style.display = "none";
+    }
+
+    // Show the main menu
+    document.querySelector(".sidebar-menu").style.display = "block";
+    hideETA()
+    removePolyline()
+}
+
+function formatTime(minutes) {
+    let hours = Math.floor(minutes / 60);
+    let remainingMinutes = Math.floor(minutes % 60);
+    let seconds = Math.round((minutes * 60) % 60);
+
+    let result = '';
+
+    if (hours > 0) {
+        result += hours + (hours === 1 ? ' hour ' : ' hours ');
+    }
+
+    if (remainingMinutes > 0) {
+        result += remainingMinutes + (remainingMinutes === 1 ? ' minute ' : ' minutes ');
+    }
+
+    if (seconds > 0 && (hours === 0 || remainingMinutes === 0)) {
+        result += seconds + (seconds === 1 ? ' second' : ' seconds');
+    }
+
+    return result.trim();
+}
+
+function displayShortestPath(data) {
+  removeTrafficLines()
+    removePolyline()
+
+    var path = data.path;
+    var latlngs = [];
+
+    for (var i = 0; i < path.length; i++) {
+        var edge = path[i];
+        // Convert edge to coordinates (lat, lng). This will depend on your system.
+        // For simplicity, assuming edge can be directly converted to [lat, lng]
+        latlngs.push(edge);
+    }
+    // Draw the path
+    polyline = L.polyline(latlngs, {color: 'blue'}).addTo(map);
+    // Zoom the map to the polyline
+    map.fitBounds(polyline.getBounds());
+    // Display the ETA in the "etaDisplay" div
+    var etaDiv = document.getElementById("etaDisplay");
+    etaDiv.textContent = "Estimated Time of Arrival (ETA): " + formatTime((data.eta)/60) + " , Length Of The Road : "+ (data.length).toFixed(2) + " meters";
+
+    etaDisplay.style.display = "block";
+}
+
+
+function callAPI() {
+    hideETA()
+    removePolyline()
+    removeTrafficLines()
+
+    // Extract values from the form fields
+    const source_junction = document.getElementById("startingPointRoute").value;
+    const destination_junction = document.getElementById("destinationRoute").value;
+
+    // Construct the URL for the API call
+    const apiUrl = `/route/get_real?source_junction=${source_junction}&destination_junction=${destination_junction}`;
+
+    // Make the API call
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                // Process the data as required
+                // For instance, if you want to display the shortest path on the map
+                displayShortestPath(data);
+            }
+        })
+        .catch(error => {
+            alert("There was an error fetching data from the server.");
+            console.error(error);
+        });
+}
+
+
+function getPredictedTrip() {
+    hideETA()
+    removePolyline()
+    removeTrafficLines()
+    // Get the data from the form
+    var startingPoint = document.getElementById("startingPoint").value;
+    var destination = document.getElementById("destination").value;
+    var tripDatetime = document.getElementById("tripDatetime").value;
+
+    // Formulate the API URL
+    var apiUrl = `/route/get_predicted_trip?source_junction=${startingPoint}&destination_junction=${destination}&pred_datetime=${tripDatetime}`;
+
+    // Make the AJAX request
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+           data.eta = (data.eta)/30
+            // Handle the API response
+            displayShortestPath(data);
+
+        })
+        .catch(error => {
+            console.error("Error fetching the predicted trip:", error);
+        });
+}
+
+
+
+function populateCurrentLocation() {
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`)
+            .then(response => response.json())
+            .then(data => {
+                var placeName = data.display_name;  // This extracts the full address name
+                document.getElementById("startingPoint").value = placeName;
+
+            })
+            .catch(error => {
+                alert("Error occurred while fetching place name: " + error.message);
+            });
+
+        }, function(error) {
+            alert("Error occurred. Error code: " + error.code);
+        });
+    } else {
+        alert("Geolocation not supported by your browser.");
+    }
+}
+
+function populateCurrentLocationRoute() {
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`)
+            .then(response => response.json())
+            .then(data => {
+                var placeName = data.display_name;  // This extracts the full address name
+                document.getElementById("startingPointRoute").value = placeName;
+
+            })
+            .catch(error => {
+                alert("Error occurred while fetching place name: " + error.message);
+            });
+
+        }, function(error) {
+            alert("Error occurred. Error code: " + error.code);
+        });
+    } else {
+        alert("Geolocation not supported by your browser.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let routeCount = 1;
+
+function addRoute() {
+    routeCount++;
+    const routesContainer = document.getElementById('routesContainer');
+    const newRoute = document.createElement('div');
+    newRoute.classList.add('route');
+    newRoute.innerHTML = `
+        <h3>Route ${routeCount}</h3>
+        <div class="coordinatesContainer">
+            <div class="coordinate">
+                <div class="form-group">
+                    <label class="form-label">Point:</label>
+                    <input type="text" class="form-input lat-input" placeholder="Enter point">
+                </div>
+
+                <button type="button" onclick="removeCoordinate(this)">Remove Coordinate</button>
+            </div>
+        </div>
+        <button type="button" onclick="addCoordinate(this)">Add Another Coordinate</button>
+        <button type="button" onclick="removeRoute(this)">Remove Route</button>
+    `;
+    routesContainer.appendChild(newRoute);
+}
+
+function removeRoute(btnElement) {
+    const routesContainer = document.getElementById('routesContainer');
+    routesContainer.removeChild(btnElement.parentElement);
+}
+
+function addCoordinate(buttonElement) {
+    const parentRoute = buttonElement.parentElement;
+    const coordinatesContainer = parentRoute.querySelector('.coordinatesContainer');
+    const newCoordinate = document.createElement('div');
+    newCoordinate.classList.add('coordinate');
+    newCoordinate.innerHTML = `
+        <div class="form-group">
+            <label class="form-label">Point:</label>
+            <input type="text" class="form-input lat-input" placeholder="Enter point">
+        </div>
+        <button type="button" onclick="removeCoordinate(this)">Remove Coordinate</button>
+    `;
+    coordinatesContainer.appendChild(newCoordinate);
+}
+
+function removeCoordinate(btnElement) {
+    const coordinatesContainer = btnElement.parentElement.parentElement;
+    coordinatesContainer.removeChild(btnElement.parentElement);
+}
+
+function processRoutes(e) {
+    hideETA()
+    removePolyline()
+    e.preventDefault();
+
+    const routeContainers = document.querySelectorAll('.route');
+    let routesData = [];
+
+    routeContainers.forEach(routeContainer => {
+        const latInputs = routeContainer.querySelectorAll('.lat-input');
+       // const lngInputs = routeContainer.querySelectorAll('.lng-input');
+
+        let routeCoordinates = [];
+        latInputs.forEach((latInput, index) => {
+            routeCoordinates.push({
+                point: latInput.value,
+            });
+        });
+
+        routesData.push(routeCoordinates);
+    });
+
+    // Send routesData to backend
+    fetch('/route/get_shortest_multiple_routes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ routes: routesData })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        displayShortestPath(data)
+        // Handle the response data as needed
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>
+

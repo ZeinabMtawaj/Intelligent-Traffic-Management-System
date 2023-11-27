@@ -1,0 +1,1 @@
+MONGO_URI = "mongodb://zmtawij:#zeinab12@ac-kscpqgn-shard-00-00.wmyn3dx.mongodb.net:27017,ac-kscpqgn-shard-00-01.wmyn3dx.mongodb.net:27017,ac-kscpqgn-shard-00-02.wmyn3dx.mongodb.net:27017/?ssl=true&replicaSet=atlas-10a9vz-shard-0&authSource=admin&retryWrites=true&w=majority"
